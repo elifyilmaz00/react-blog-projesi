@@ -1,35 +1,44 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { useState } from 'react';
+import { Routes, Route, useNavigate } from 'react-router-dom';
+import Navbar from './components/Navbar';
+import Anasayfa from './pages/Anasayfa';
+import YaziDetay from './pages/YaziDetay';
+import YeniYazi from './pages/YeniYazi';
+import './index.css'; // Global stiller için
 
 function App() {
-  const [count, setCount] = useState(0)
+  const [posts, setPosts] = useState([
+    { id: 1, title: 'React Öğreniyorum', content: 'Bugün state ve props öğrendim.' },
+    { id: 2, title: 'React Router Harika', content: 'Sayfalar arası geçiş çok kolay.' }
+  ]);
+
+  const navigate = useNavigate(); // Programatik olarak yönlendirme yapmak için.
+
+  // Yeni bir post ekleyen fonksiyon. Bunu YeniYazi component'ine prop olarak göndereceğiz.
+  const handleAddPost = (post) => {
+    const newPost = { id: Date.now(), ...post };
+    setPosts([...posts, newPost]);
+    // Post eklendikten sonra anasayfaya yönlendir.
+    navigate('/'); 
+  };
 
   return (
     <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
+      <Navbar />
+      <div className="container">
+        <Routes>
+          {/* Anasayfa component'ine 'posts' dizisini prop olarak gönderiyoruz. */}
+          <Route path="/" element={<Anasayfa posts={posts} />} />
+
+          {/* YeniYazi component'ine post ekleme fonksiyonunu prop olarak gönderiyoruz. */}
+          <Route path="/yeni-yazi" element={<YeniYazi onAddPost={handleAddPost} />} />
+
+          {/* YaziDetay component'ine de tüm post'ları gönderiyoruz ki ID'ye göre doğru olanı bulabilsin. */}
+          <Route path="/yazi/:id" element={<YaziDetay posts={posts} />} />
+        </Routes>
       </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
     </>
-  )
+  );
 }
 
-export default App
+export default App;
